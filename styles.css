@@ -1,34 +1,10 @@
 /* ── Critter Forge · cozy palette derived from the Ko-fi design language ── */
 
-/* Brand display font — dafont.com/es/promised-freyna.font (drop files in /fonts) */
-@font-face {
-  font-family: "Promised Freyna";
-  src: url("/fonts/promised-freyna.woff2") format("woff2"),
-       url("/fonts/promised-freyna.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-/* Body font — dafont.com/es/cocogoose-classic.font (drop files in /fonts) */
-@font-face {
-  font-family: "Cocogoose Classic";
-  src: url("/fonts/cocogoose-classic.woff2") format("woff2"),
-       url("/fonts/cocogoose-classic.ttf") format("truetype");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Cocogoose Classic";
-  src: url("/fonts/cocogoose-classic-bold.woff2") format("woff2"),
-       url("/fonts/cocogoose-classic-bold.ttf") format("truetype");
-  font-weight: 700;
-  font-display: swap;
-}
-
 :root {
-  /* Promised Freyna for branding/titles; Cocogoose Classic for everything else.
-     DM Sans stays as a graceful fallback until the font files are added. */
-  --font-display: "Promised Freyna", "DM Sans", system-ui, sans-serif;
-  --font-body: "Cocogoose Classic", "DM Sans", system-ui, -apple-system, sans-serif;
+  /* Handjet (LED/pixel display) for branding/titles; Fresca for body text.
+     Loaded from Google Fonts in each page's <head>; DM Sans as fallback. */
+  --font-display: "Handjet", "DM Sans", system-ui, sans-serif;
+  --font-body: "Fresca", "DM Sans", system-ui, -apple-system, sans-serif;
 
   --bg0: #f4efe7;   /* warm cream page */
   --bg1: #ffffff;   /* cards */
@@ -80,18 +56,25 @@ body {
 .orb-c { width: 240px; height: 240px; background: #d9ecd7; top: 40%; left: 55%; animation: float 22s var(--ease) infinite alternate; }
 @keyframes float { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,-30px) scale(1.08); } }
 
-.wrap { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 32px) 64px; }
+/* The page chrome (hero + type selector) is WIDE; the generator column itself
+   is NARROW so it crops cleanly to a 9:16 TikTok screen recording. */
+.wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 32px) 64px; }
+
+/* shared narrow column used by the generator (TikTok-safe width) */
+:root { --tiktok-col: 420px; }
 
 /* hero */
 .hero { text-align: center; margin-bottom: 26px; animation: slide-up var(--dur-md) var(--ease) both; }
 .title {
   font-family: var(--font-display);
-  font-size: clamp(30px, 6.5vw, 56px);
-  font-weight: 400;
+  font-optical-sizing: auto;
+  font-variation-settings: "ELGR" 1, "ELSH" 2;
+  font-size: clamp(34px, 7.5vw, 64px);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .015em;
+  letter-spacing: .02em;
   margin: 0 0 4px;
-  line-height: 1.05;
+  line-height: 1;
 }
 .byline { margin: 0 0 10px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
 .byline a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color var(--dur-sm) var(--ease); }
@@ -160,29 +143,15 @@ body {
 
 .hint { text-align: center; color: var(--accent); font-weight: 500; margin: 14px 0 0; animation: pop var(--dur-md) var(--spring) both; }
 
-/* stage = narrow slot list flanked by side decorations */
+/* stage = narrow, centered generator column sized for a 9:16 TikTok crop */
 .stage {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr minmax(0, 520px) 1fr;
-  align-items: stretch;
-  gap: 18px;
-  margin-top: 24px;
+  width: 100%;
+  max-width: var(--tiktok-col);
+  margin: 24px auto 0;
 }
-.deco {
-  position: relative; align-self: stretch; min-height: 100%;
-  border-radius: var(--r-full); pointer-events: none;
-  background:
-    repeating-linear-gradient(180deg, var(--blue-soft) 0 7px, transparent 7px 26px) center / 2px 100% no-repeat;
-  opacity: .5;
-}
-.deco::before, .deco::after {
-  content: "🐾"; position: absolute; left: 50%; transform: translateX(-50%);
-  font-size: 18px; opacity: .55; filter: saturate(.7);
-}
-.deco::before { top: 6px; }
-.deco::after  { bottom: 6px; }
-.deco-right { transform: scaleX(-1); }
+/* side decorations no longer fit the narrow column — retire them */
+.deco { display: none; }
 
 /* slots list */
 .slots { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -193,9 +162,10 @@ body {
   transition: transform var(--dur-sm) var(--ease), box-shadow var(--dur-sm) var(--ease), border-color var(--dur-sm) var(--ease), background var(--dur-sm) var(--ease);
   animation: slide-up var(--dur-md) var(--ease) both;
 }
-.slot:hover { box-shadow: var(--sh-lift); border-color: var(--blue-soft); }
-.slot.is-rolling { border-color: var(--blue); }
-.slot.is-hidden { background: var(--bg2); }
+.slot:hover { box-shadow: var(--sh-lift); border-color: rgba(255,90,22,.30); }
+.slot.is-rolling { border-color: var(--accent); }
+.slot.landed { border-color: rgba(255,90,22,.35); }
+.slot.is-hidden { background: var(--bg2); border-color: var(--line); }
 .slot.is-hidden:hover { transform: translateX(2px); }
 
 .slot-main { display: flex; align-items: baseline; gap: 14px; flex: 1; min-width: 0; }
@@ -212,12 +182,20 @@ body {
   appearance: none; border: 0; background: transparent; text-align: left;
   font: inherit; font-weight: 700; font-size: clamp(17px, 2.2vw, 21px); line-height: 1.2;
   color: var(--text); cursor: pointer; padding: 2px 0;
-  text-transform: capitalize; word-break: break-word; flex: 1; min-width: 0;
+  text-transform: capitalize; word-break: break-word; min-width: 0;
   transition: color var(--dur-xs) var(--ease);
+  align-self: flex-start;
 }
-.slot-value:hover { color: var(--blue-deep); }
+/* Ko-fi style active underline — slides in under the revealed value */
+.slot-value::after {
+  content: ""; display: block; height: 3px; width: 0;
+  margin-top: 4px; border-radius: 2px; background: var(--accent);
+  transition: width var(--dur-md) var(--spring);
+}
+.slot:not(.is-hidden):not(.is-empty) .slot-value::after { width: 100%; }
+.slot-value:hover { color: var(--accent); }
 .slot-value .ghost { color: var(--muted); font-weight: 500; text-transform: none; }
-.slot.is-hidden .slot-value:hover .ghost { color: var(--blue-deep); }
+.slot.is-hidden .slot-value:hover .ghost { color: var(--accent); }
 .slot.landed .slot-value { animation: pop var(--dur-md) var(--spring); }
 .slot.is-empty .slot-value { color: var(--muted); font-weight: 500; font-style: italic; text-transform: none; }
 
@@ -232,17 +210,13 @@ body {
   background: var(--bg2); border: 1px solid transparent; border-radius: var(--r-sm);
   padding: 7px 11px; cursor: pointer; transition: all var(--dur-xs) var(--ease); white-space: nowrap;
 }
-.ico-btn:hover { color: var(--blue-deep); background: var(--blue-soft); transform: translateY(-1px); }
+.ico-btn:hover { color: var(--accent); background: #ffe1d2; transform: translateY(-1px); }
 .ico-btn.copy.copied { color: var(--green); background: rgba(46,157,91,.14); }
 /* hide value-dependent UI until revealed */
 .slot.is-hidden .slot-type,
 .slot.is-hidden .slot-actions,
 .slot.is-empty .slot-actions { display: none; }
 
-@media (max-width: 720px) {
-  .stage { grid-template-columns: 1fr; gap: 0; }
-  .deco { display: none; }
-}
 @media (max-width: 560px) {
   .slot { flex-wrap: wrap; gap: 8px 12px; }
   .slot-right { width: 100%; justify-content: flex-start; }
