@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creations · Random Animal Generator</title>
+  <meta name="description" content="An exhibition of creatures drawn by the community from the Random Animal Generator. Submit your own — pick a critter, draw it, share it." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖼️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="creations.css" />
+</head>
+<body>
+  <div class="orbs" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+  </div>
+
+  <main class="wrap">
+    <header class="hero">
+      <h1 class="title">🖼️ Creations</h1>
+      <p class="byline">an exhibition by the <a href="/">Random Animal Generator</a> community</p>
+      <p class="subtitle">Real artists, real critters. Roll a creature, draw it, and add it to the wall.</p>
+      <div class="controls">
+        <a href="/" class="btn btn-ghost"><span class="btn-emoji">←</span> Back to generator</a>
+        <button id="openSubmit" class="btn btn-primary" type="button"><span class="btn-emoji">＋</span> Submit your creation</button>
+      </div>
+    </header>
+
+    <p id="status" class="gallery-status" hidden></p>
+    <section id="gallery" class="gallery" aria-label="Community creations"></section>
+
+    <footer class="foot">
+      <span>Images hosted on Cloudinary · submissions are reviewed before they appear</span>
+    </footer>
+  </main>
+
+  <!-- Submission dialog -->
+  <dialog id="submitDialog" class="dialog">
+    <form id="submitForm" class="submit-form" method="dialog">
+      <div class="dialog-head">
+        <h2>Submit your creation</h2>
+        <button type="button" class="dialog-close" id="closeSubmit" aria-label="Close">✕</button>
+      </div>
+      <p class="dialog-sub">It'll show up in the gallery once it's approved. Be kind — only your own art, please.</p>
+
+      <label class="field">
+        <span class="field-label">Your artwork <em>*</em></span>
+        <input id="imageInput" name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required />
+        <span class="field-hint">PNG, JPG, WEBP or GIF · up to 10 MB</span>
+      </label>
+
+      <div class="preview" id="preview" hidden><img id="previewImg" alt="Preview of your upload" /></div>
+
+      <label class="field">
+        <span class="field-label">Artist name / handle <em>*</em></span>
+        <input id="artistInput" name="artist" type="text" maxlength="60" placeholder="e.g. @critter.queen" required />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Title <span class="opt">(optional)</span></span>
+        <input id="titleInput" name="title" type="text" maxlength="80" placeholder="e.g. Narwhal-legged tiger" />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Social link <em>*</em></span>
+        <input id="socialInput" name="social" type="url" placeholder="https://instagram.com/yourname" required />
+        <span class="field-hint">Instagram, X, Bluesky, your portfolio — wherever people can find you</span>
+      </label>
+
+      <p id="formMsg" class="form-msg" hidden></p>
+
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-ghost" id="cancelSubmit">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="sendSubmit">
+          <span class="send-label">Submit for review</span>
+          <span class="send-progress" hidden></span>
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="creations.js"></script>
+</body>
+</html>

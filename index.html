@@ -20,8 +20,9 @@
 
   <main class="wrap">
     <header class="hero">
-      <h1 class="title">🐾 Random Animal Gen <span class="by">by <a href="https://github.com/ElMariones" target="_blank" rel="noopener">Mario&nbsp;Landaburu</a></span></h1>
-      <p class="subtitle">Tap a row to reveal it, or reroll the whole creature — built from <strong id="animalCount">564</strong> real animals.</p>
+      <h1 class="title">🐾 Random Animal Generator</h1>
+      <p class="byline">by <a href="https://github.com/ElMariones" target="_blank" rel="noopener">Mario&nbsp;Landáburu</a></p>
+      <p class="subtitle">Tap any row to roll it — built from <strong id="animalCount">600</strong> real animals.</p>
     </header>
 
     <section class="panel types" aria-label="Animal type filter">
@@ -35,23 +36,24 @@
     </section>
 
     <div class="controls">
-      <button id="reroll" class="btn btn-primary" type="button">
-        <span class="btn-emoji">🎲</span> Reroll
-      </button>
       <button id="clearBtn" class="btn btn-ghost" type="button">
         <span class="btn-emoji">↺</span> Clear
       </button>
-      <button id="copyAll" class="btn btn-ghost" type="button">
-        <span class="btn-emoji">📋</span> Copy recipe
-      </button>
+      <a href="/creations" class="btn btn-primary" id="viewCreations">
+        <span class="btn-emoji">🖼️</span> View creations
+      </a>
     </div>
 
     <p id="hint" class="hint" hidden></p>
 
-    <section id="slots" class="slots" aria-label="Generated creature"></section>
+    <div class="stage">
+      <span class="deco deco-left" aria-hidden="true"></span>
+      <section id="slots" class="slots" aria-label="Generated creature"></section>
+      <span class="deco deco-right" aria-hidden="true"></span>
+    </div>
 
     <footer class="foot">
-      <span>Tap any row to reveal &amp; re-roll it · <span class="kbd">🔍</span> opens Google Images · <span class="kbd">📋</span> copies the name</span>
+      <span>Tap any row to roll it · <span class="kbd">🔍</span> opens Google Images · <span class="kbd">📋</span> copies the name</span>
     </footer>
   </main>
 

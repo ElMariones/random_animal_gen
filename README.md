@@ -10,11 +10,21 @@ from hundreds of real animals. Filter by animal type, then spin.
 - **Spin everything** or click a single card to re-roll just that part — slot-machine style, with a calm reduced-motion fallback.
 - **Visualize instantly** — every result links straight to **Google Images** (🔍) and has a one-tap **Copy** (📋); *Copy recipe* grabs the whole creature. No images are stored or hosted by the site.
 
+## Creations gallery
+
+`/creations` is a community exhibition: artists submit a drawing of a rolled creature
+(image + name + social link), visitors **like** their favourites (one per browser,
+sorted most-liked first), and you moderate submissions at `/admin`. Images live on
+Cloudinary's CDN; submissions, likes and approval status live in Supabase — both free
+tier, both client-side, no server. See [`SETUP.md`](SETUP.md) to switch it on.
+
 ## Tech
 
-Plain HTML/CSS/JS (ES modules) — no build step, no dependencies. The palette and
-motion come from the Ko-fi design language in the (git-ignored) `design/` folder.
-`data.js` is generated from `animals.txt` and ships every animal pre-categorised.
+Plain HTML/CSS/JS (ES modules) — no build step, no dependencies (the Supabase client is
+loaded from a CDN). The palette and motion come from the Ko-fi design language in the
+(git-ignored) `design/` folder. `data.js` is generated from `animals.txt` and ships every
+animal pre-categorised. Branding uses **Promised Freyna**, body text **Cocogoose Classic**
+(see [`fonts/README.md`](fonts/README.md)).
 
 ## Run locally
 

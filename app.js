@@ -11,9 +11,7 @@ const rollToken = {};                        // part -> id; bumping it cancels a
 const $chips     = document.getElementById("typeChips");
 const $slots     = document.getElementById("slots");
 const $selectAll = document.getElementById("selectAll");
-const $reroll    = document.getElementById("reroll");
 const $clear     = document.getElementById("clearBtn");
-const $copyAll   = document.getElementById("copyAll");
 const $hint      = document.getElementById("hint");
 const $toast     = document.getElementById("toast");
 const $count     = document.getElementById("animalCount");
@@ -23,9 +21,17 @@ $count.textContent = new Set([].concat(...Object.values(PARTS))).size;
 // ── helpers ──────────────────────────────────────────────────────────────────
 const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+const EXTRAS_REAL = EXTRAS.filter((e) => e !== "none");   // every feature except "none"
+
 function poolFor(part) {
   if (part === "extra") return EXTRAS;                 // features are never type-filtered
   return PARTS[part].filter((a) => selectedTypes.has(TYPES[a]));
+}
+
+// "extra" is weighted: ~20% "none", ~80% a feature from the list
+function pickFinal(part, pool) {
+  if (part === "extra") return Math.random() < 0.2 ? "none" : rand(EXTRAS_REAL);
+  return rand(pool);
 }
 
 const imagesUrl = (q) => "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(q);
@@ -96,7 +102,6 @@ $selectAll.addEventListener("click", () => {
 
 function updateAvailability() {
   const none = selectedTypes.size === 0;
-  $reroll.disabled = none;
   $hint.hidden = !none;
   if (none) $hint.textContent = "Pick at least one animal type to start rolling.";
 }
@@ -112,7 +117,10 @@ function buildSlots() {
     el.innerHTML = `
       <div class="slot-main">
         <span class="slot-label">${PART_LABELS[part]}</span>
-        <button class="slot-value" type="button"><span class="ghost">🎲 Tap to reveal</span></button>
+        <div class="slot-value-wrap">
+          <button class="slot-value" type="button"><span class="ghost">🎲 Tap to roll</span></button>
+          <span class="reroll-hint">tap again to reroll</span>
+        </div>
       </div>
       <div class="slot-right">
         <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
@@ -138,7 +146,7 @@ function hideSlot(part) {
   el.classList.add("is-hidden");
   el.classList.remove("landed", "is-rolling", "is-empty");
   el.querySelector(".slot-type").hidden = true;
-  el.querySelector(".slot-value").innerHTML = `<span class="ghost">🎲 Tap to reveal</span>`;
+  el.querySelector(".slot-value").innerHTML = `<span class="ghost">🎲 Tap to roll</span>`;
 }
 
 function setSlotValue(part, value) {
@@ -181,7 +189,7 @@ function rollSlot(part) {
 
   const myToken = (rollToken[part] = (rollToken[part] || 0) + 1);
   if (pool.length === 0) { setSlotValue(part, null); return Promise.resolve(); }
-  const final = rand(pool);
+  const final = pickFinal(part, pool);
 
   if (reduceMotion) { setSlotValue(part, final); return Promise.resolve(); }
 
@@ -206,31 +214,12 @@ function rollSlot(part) {
 let pendingTimers = [];
 function cancelPending() { pendingTimers.forEach(clearTimeout); pendingTimers = []; }
 
-async function rerollAll() {
-  if (selectedTypes.size === 0) return;
-  cancelPending();
-  $reroll.classList.add("is-spinning");
-  const jobs = PART_ORDER.map((part, i) =>
-    new Promise((res) => pendingTimers.push(setTimeout(() => rollSlot(part).then(res), reduceMotion ? 0 : i * 70)))
-  );
-  await Promise.all(jobs);
-  $reroll.classList.remove("is-spinning");
-}
-
 function clearAll() {
   cancelPending();                       // stop not-yet-started staggered rolls
-  $reroll.classList.remove("is-spinning");
   PART_ORDER.forEach(hideSlot);          // bumps tokens -> cancels in-flight rolls
 }
 
-$reroll.addEventListener("click", rerollAll);
 $clear.addEventListener("click", clearAll);
-
-$copyAll.addEventListener("click", () => {
-  const lines = PART_ORDER.filter((p) => current[p]).map((p) => `${PART_LABELS[p]}: ${current[p]}`);
-  if (!lines.length) return showToast("Reveal something first!");
-  copyText(lines.join("\n"), "Recipe copied to clipboard");
-});
 
 // ── init (nothing is revealed until the user acts) ───────────────────────────
 buildChips();

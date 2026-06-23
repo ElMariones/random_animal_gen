@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Admin · Creations moderation</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="creations.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero">
+      <h1 class="title">🛡️ Moderation</h1>
+      <p class="byline">Random Animal Generator · creations admin</p>
+    </header>
+
+    <!-- login -->
+    <section id="loginView" class="panel admin-login" hidden>
+      <form id="loginForm">
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input id="email" type="email" autocomplete="username" required />
+        </label>
+        <label class="field">
+          <span class="field-label">Password</span>
+          <input id="password" type="password" autocomplete="current-password" required />
+        </label>
+        <p id="loginMsg" class="form-msg" hidden></p>
+        <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;">Log in</button>
+      </form>
+    </section>
+
+    <!-- dashboard -->
+    <section id="adminView" hidden>
+      <div class="admin-bar">
+        <div class="admin-tabs">
+          <button class="admin-tab is-on" data-tab="pending" type="button">Pending</button>
+          <button class="admin-tab" data-tab="approved" type="button">Approved</button>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <a href="/creations" class="btn btn-ghost" style="padding:9px 16px;font-size:14px;">View gallery</a>
+          <button id="logout" class="btn btn-ghost" type="button" style="padding:9px 16px;font-size:14px;">Log out</button>
+        </div>
+      </div>
+      <p id="adminStatus" class="gallery-status" hidden></p>
+      <div id="adminList" class="admin-list"></div>
+    </section>
+
+    <p id="notConfigured" class="gallery-status" hidden></p>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
