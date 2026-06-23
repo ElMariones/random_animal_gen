@@ -1,7 +1,5 @@
-# Source design references & raw data (not deployed)
+# Source design references (not deployed)
 design/
-animals.txt
-._animals.txt
 
 # OS / editor cruft
 .DS_Store

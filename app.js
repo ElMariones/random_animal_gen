@@ -91,7 +91,7 @@ function buildChips() {
     btn.className = "chip" + (on ? " is-on" : "");
     btn.dataset.type = t;
     btn.setAttribute("aria-pressed", String(on));
-    btn.innerHTML = `<span class="c-emoji">${meta.emoji}</span>${meta.label}<span class="c-count">${count}</span>`;
+    btn.innerHTML = `<span class="c-emoji">${meta.svg || meta.emoji}</span>${meta.label}<span class="c-count">${count}</span>`;
     btn.addEventListener("click", () => toggleType(t, btn));
     $chips.appendChild(btn);
   }
@@ -204,7 +204,8 @@ function setSlotValue(part, value) {
   const meta = typeBadge(part, value);
   badge.hidden = false;
   badge.title = meta.label;       // emoji-only chip; full category shows on hover
-  badge.querySelector(".st-emoji").textContent = meta.emoji;
+  const stEmoji = badge.querySelector(".st-emoji");
+  if (meta.svg) stEmoji.innerHTML = meta.svg; else stEmoji.textContent = meta.emoji;
   badge.querySelector(".st-label").textContent = meta.label;
   gimg.href = imagesUrl(value);
 

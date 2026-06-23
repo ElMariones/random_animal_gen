@@ -20,7 +20,7 @@ export const TYPE_META = {
   aquatic:  { label: "Sea & Fish",       emoji: "🐠" },
   bugs:     { label: "Bugs & Insects",   emoji: "🐝" },
   reptamph: { label: "Reptiles & Dinos", emoji: "🦎" },
-  pokemon:  { label: "Pokémon",          emoji: "🔴" }
+  pokemon:  { label: "Pokémon", emoji: "🔴", svg: "<svg class='type-svg' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg' aria-hidden='true'><circle cx='16' cy='16' r='13' fill='#fff'/><path d='M3 16a13 13 0 0 1 26 0Z' fill='#ee1515'/><path d='M3 16h26' stroke='#2a2622' stroke-width='2.4'/><circle cx='16' cy='16' r='4.3' fill='#fff' stroke='#2a2622' stroke-width='2'/><circle cx='16' cy='16' r='1.5' fill='#fff' stroke='#2a2622' stroke-width='1.4'/><circle cx='16' cy='16' r='13' fill='none' stroke='#2a2622' stroke-width='2'/></svg>" }
 };
 
 export const PARTS = {
