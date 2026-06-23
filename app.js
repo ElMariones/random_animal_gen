@@ -1,5 +1,6 @@
 import { PART_ORDER, PART_LABELS, TYPE_ORDER, TYPE_META, PARTS, EXTRAS, TYPES, DEFAULT_TYPES } from "./data.js";
 import { playRoll } from "./fx.js";
+import { T, onLang } from "./i18n.js";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -68,14 +69,14 @@ async function copyToClipboard(text) {
 async function copyName(part) {
   const value = current[part];
   if (!value) return;
-  if (!(await copyToClipboard(value))) { showToast("Couldn't copy — check permissions"); return; }
+  if (!(await copyToClipboard(value))) { showToast(T().toastCopyFail); return; }
   const el = $slots.querySelector(`.slot[data-part="${part}"]`);
   el.classList.remove("copied");
   void el.offsetWidth;            // restart the pop animation on repeat copies
   el.classList.add("copied");
   clearTimeout(copyName._t);
   copyName._t = setTimeout(() => el.classList.remove("copied"), 1300);
-  showToast(`Copied “${value}”`);
+  showToast(T().copied(value));
 }
 
 // ── type chips ───────────────────────────────────────────────────────────────
@@ -91,7 +92,7 @@ function buildChips() {
     btn.className = "chip" + (on ? " is-on" : "");
     btn.dataset.type = t;
     btn.setAttribute("aria-pressed", String(on));
-    btn.innerHTML = `<span class="c-emoji">${meta.svg || meta.emoji}</span>${meta.label}<span class="c-count">${count}</span>`;
+    btn.innerHTML = `<span class="c-emoji">${meta.svg || meta.emoji}</span>${T().types[t] || meta.label}<span class="c-count">${count}</span>`;
     btn.addEventListener("click", () => toggleType(t, btn));
     $chips.appendChild(btn);
   }
@@ -128,7 +129,7 @@ $selectAll.addEventListener("click", () => {
 function updateAvailability() {
   const none = selectedTypes.size === 0;
   $hint.hidden = !none;
-  if (none) $hint.textContent = "Pick at least one animal type to start rolling.";
+  if (none) $hint.textContent = T().hintPickType;
 }
 
 // ── list rows ────────────────────────────────────────────────────────────────
@@ -140,14 +141,14 @@ function buildSlots() {
     el.dataset.part = part;
     el.style.animationDelay = (i * 30) + "ms";
     el.innerHTML = `
-      <span class="slot-label">${PART_LABELS[part]}</span>
-      <button class="slot-value" type="button"><span class="ghost">Tap to roll</span></button>
-      <span class="copied-flag" aria-hidden="true">✓ Copied</span>
+      <span class="slot-label">${T().parts[part]}</span>
+      <button class="slot-value" type="button"><span class="ghost">${T().tapToRoll}</span></button>
+      <span class="copied-flag" aria-hidden="true">✓</span>
       <div class="slot-right">
         <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
         <div class="slot-actions">
-          <a class="ico-btn gimg" target="_blank" rel="noopener" title="Search Google Images" aria-label="Search Google Images">🔍</a>
-          <button class="ico-btn reroll" type="button" title="Reroll this part" aria-label="Reroll this part">🎲</button>
+          <a class="ico-btn gimg" target="_blank" rel="noopener" title="${T().imagesTitle}" aria-label="${T().imagesTitle}">🔍</a>
+          <button class="ico-btn reroll" type="button" title="${T().rerollTitle}" aria-label="${T().rerollTitle}">🎲</button>
         </div>
       </div>
       <span class="roll-dice" aria-hidden="true">🎲</span>`;
@@ -178,7 +179,7 @@ function hideSlot(part) {
   el.classList.add("is-hidden");
   el.classList.remove("landed", "is-rolling", "is-empty", "copied");
   el.querySelector(".slot-type").hidden = true;
-  el.querySelector(".slot-value").innerHTML = `<span class="ghost">Tap to roll</span>`;
+  el.querySelector(".slot-value").innerHTML = `<span class="ghost">${T().tapToRoll}</span>`;
 }
 
 function setSlotValue(part, value) {
@@ -193,7 +194,7 @@ function setSlotValue(part, value) {
     current[part] = null;
     el.classList.add("is-empty");
     badge.hidden = true;
-    valueBtn.textContent = "no match for this filter";
+    valueBtn.textContent = T().noMatch;
     return;
   }
 
@@ -202,11 +203,12 @@ function setSlotValue(part, value) {
   valueBtn.textContent = value;
 
   const meta = typeBadge(part, value);
+  const label = part === "extra" ? T().featureLabel : (T().types[TYPES[value]] || meta.label);
   badge.hidden = false;
-  badge.title = meta.label;       // emoji-only chip; full category shows on hover
+  badge.title = label;            // emoji-only chip; full category shows on hover
   const stEmoji = badge.querySelector(".st-emoji");
   if (meta.svg) stEmoji.innerHTML = meta.svg; else stEmoji.textContent = meta.emoji;
-  badge.querySelector(".st-label").textContent = meta.label;
+  badge.querySelector(".st-label").textContent = label;
   gimg.href = imagesUrl(value);
 
   el.classList.remove("landed");
@@ -216,7 +218,7 @@ function setSlotValue(part, value) {
 
 // reveal/re-roll a single row: flicker through the pool, then settle
 function rollSlot(part) {
-  if (selectedTypes.size === 0) { showToast("Pick at least one animal type first"); return Promise.resolve(); }
+  if (selectedTypes.size === 0) { showToast(T().toastPickType); return Promise.resolve(); }
   const pool = poolFor(part);
   const el = $slots.querySelector(`.slot[data-part="${part}"]`);
   const valueBtn = el.querySelector(".slot-value");
@@ -259,6 +261,33 @@ function clearAll() {
 }
 
 $clear.addEventListener("click", clearAll);
+
+// ── language: re-localize in place without resetting any rolled values ───────
+function applyDynamicLang() {
+  const d = T();
+  buildChips();                          // localized labels; is-on state kept via selectedTypes
+  $slots.querySelectorAll(".slot").forEach((el) => {
+    const part = el.dataset.part;
+    el.querySelector(".slot-label").textContent = d.parts[part];
+    const reroll = el.querySelector(".reroll"); reroll.title = d.rerollTitle; reroll.setAttribute("aria-label", d.rerollTitle);
+    const gimg = el.querySelector(".gimg"); gimg.title = d.imagesTitle; gimg.setAttribute("aria-label", d.imagesTitle);
+    if (el.classList.contains("is-hidden")) {
+      const ghost = el.querySelector(".ghost"); if (ghost) ghost.textContent = d.tapToRoll;
+    } else if (el.classList.contains("is-empty")) {
+      el.querySelector(".slot-value").textContent = d.noMatch;
+    } else {
+      const val = current[part];
+      if (val) {
+        const label = part === "extra" ? d.featureLabel : (d.types[TYPES[val]] || "");
+        const badge = el.querySelector(".slot-type");
+        badge.title = label;
+        badge.querySelector(".st-label").textContent = label;
+      }
+    }
+  });
+  if (!$hint.hidden) $hint.textContent = d.hintPickType;
+}
+onLang(applyDynamicLang);
 
 // ── init (nothing is revealed until the user acts) ───────────────────────────
 buildChips();

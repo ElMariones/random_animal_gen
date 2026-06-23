@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creations · Random Animal Generator</title>
+  <title data-i18n="docTitleCre">Creations · Random Animal Generator</title>
   <meta name="description" content="An exhibition of creatures drawn by the community from the Random Animal Generator. Submit your own — pick a critter, draw it, share it." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'><path d='M16 3.5C9 3.5 3.3 8.7 3.3 15.1c0 5.2 4.2 8.4 8.4 8.4 1.7 0 2.7-1.1 2.7-2.5 0-.6-.2-1-.2-1.6 0-1.2.9-2 2.1-2h2.2c3.8 0 7.2-2.9 7.2-7C25.7 7.2 21.4 3.5 16 3.5Z' fill='%23fff' stroke='%232a2622' stroke-width='2'/><circle cx='9' cy='15' r='1.7' fill='%234a85e8'/><circle cx='12.3' cy='9.8' r='1.7' fill='%232e9d5b'/><circle cx='18' cy='8.6' r='1.7' fill='%23ff5a16'/><circle cx='22' cy='13' r='1.7' fill='%23f2c14e'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="creations.css" />
 </head>
 <body>
+  <div id="langSwitch" class="lang-switch"></div>
+
   <div class="orbs" aria-hidden="true">
     <span class="orb orb-a"></span>
     <span class="orb orb-b"></span>
@@ -27,12 +29,12 @@
           <circle cx="12.3" cy="9.8" r="1.7" fill="#2e9d5b"/>
           <circle cx="18" cy="8.6" r="1.7" fill="#ff5a16"/>
           <circle cx="22" cy="13" r="1.7" fill="#f2c14e"/>
-        </svg> Creations</h1>
-      <p class="byline">an exhibition by the <a href="/">Random Animal Generator</a> community</p>
-      <p class="subtitle">Real artists, fantastical creatures. Roll the dice, draw, and add it to the wall!</p>
+        </svg> <span data-i18n="creTitle">Creations</span></h1>
+      <p class="byline" data-i18n-html="creBylineHtml">an exhibition by the <a href="/">Random Animal Generator</a> community</p>
+      <p class="subtitle" data-i18n="creSubtitle">Real artists, fantastical creatures. Roll the dice, draw, and add it to the wall!</p>
       <div class="controls">
-        <a href="/" class="btn btn-ghost"><span class="btn-emoji">←</span> Back to generator</a>
-        <button id="openSubmit" class="btn btn-primary" type="button"><span class="btn-emoji">＋</span> Submit your creation</button>
+        <a href="/" class="btn btn-ghost"><span class="btn-emoji">←</span> <span data-i18n="backToGen">Back to generator</span></a>
+        <button id="openSubmit" class="btn btn-primary" type="button"><span class="btn-emoji">＋</span> <span data-i18n="submitCreation">Submit your creation</span></button>
       </div>
     </header>
 
@@ -40,7 +42,7 @@
     <section id="gallery" class="gallery" aria-label="Community creations"></section>
 
     <footer class="foot">
-      <span>Images hosted on Cloudinary · submissions are reviewed before they appear</span>
+      <span data-i18n="creFooter">Images hosted on Cloudinary · submissions are reviewed before they appear</span>
     </footer>
   </main>
 
@@ -48,41 +50,41 @@
   <dialog id="submitDialog" class="dialog">
     <form id="submitForm" class="submit-form" method="dialog">
       <div class="dialog-head">
-        <h2>Submit your creation</h2>
+        <h2 data-i18n="submitCreation">Submit your creation</h2>
         <button type="button" class="dialog-close" id="closeSubmit" aria-label="Close">✕</button>
       </div>
-      <p class="dialog-sub">It'll show up in the gallery once it's approved. Be kind — only your own art, please.</p>
+      <p class="dialog-sub" data-i18n="dlgSub">It'll show up in the gallery once it's approved. Be kind, only your own art please.</p>
 
       <label class="field">
-        <span class="field-label">Your artwork <em>*</em></span>
+        <span class="field-label"><span data-i18n="fArtwork">Your artwork</span> <em>*</em></span>
         <input id="imageInput" name="image" type="file" accept="image/png,image/jpeg,image/webp,image/gif" required />
-        <span class="field-hint">PNG, JPG, WEBP or GIF · up to 10 MB</span>
+        <span class="field-hint" data-i18n="fArtworkHint">PNG, JPG, WEBP or GIF · up to 10 MB</span>
       </label>
 
       <div class="preview" id="preview" hidden><img id="previewImg" alt="Preview of your upload" /></div>
 
       <label class="field">
-        <span class="field-label">Artist name / handle <em>*</em></span>
-        <input id="artistInput" name="artist" type="text" maxlength="60" placeholder="e.g. @critter.queen" required />
+        <span class="field-label"><span data-i18n="fArtist">Artist name / handle</span> <em>*</em></span>
+        <input id="artistInput" name="artist" type="text" maxlength="60" placeholder="e.g. @critter.queen" data-i18n-ph="fArtistPh" required />
       </label>
 
       <label class="field">
-        <span class="field-label">Title <span class="opt">(optional)</span></span>
-        <input id="titleInput" name="title" type="text" maxlength="80" placeholder="e.g. Narwhal-legged tiger" />
+        <span class="field-label"><span data-i18n="fTitle">Title</span> <span class="opt" data-i18n="optional">(optional)</span></span>
+        <input id="titleInput" name="title" type="text" maxlength="80" placeholder="e.g. Narwhal-legged tiger" data-i18n-ph="fTitlePh" />
       </label>
 
       <label class="field">
-        <span class="field-label">Social link <span class="opt">(optional)</span></span>
-        <input id="socialInput" name="social" type="text" placeholder="instagram.com/yourname" />
-        <span class="field-hint">Instagram, X, Bluesky, your portfolio — no need to type <code>https://</code>. Leave blank to stay anonymous.</span>
+        <span class="field-label"><span data-i18n="fSocial">Social link</span> <span class="opt" data-i18n="optional">(optional)</span></span>
+        <input id="socialInput" name="social" type="text" placeholder="instagram.com/yourname" data-i18n-ph="fSocialPh" />
+        <span class="field-hint" data-i18n-html="fSocialHint">Instagram, X, Bluesky, your portfolio — no need to type <code>https://</code>. Leave blank to stay anonymous.</span>
       </label>
 
       <p id="formMsg" class="form-msg" hidden></p>
 
       <div class="dialog-actions">
-        <button type="button" class="btn btn-ghost" id="cancelSubmit">Cancel</button>
+        <button type="button" class="btn btn-ghost" id="cancelSubmit" data-i18n="cancel">Cancel</button>
         <button type="submit" class="btn btn-primary" id="sendSubmit">
-          <span class="send-label">Submit for review</span>
+          <span class="send-label" data-i18n="submitReview">Submit for review</span>
           <span class="send-progress" hidden></span>
         </button>
       </div>

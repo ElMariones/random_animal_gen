@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Random Animal Generator</title>
+  <title data-i18n="docTitleGen">Random Animal Generator</title>
   <meta name="description" content="Roll a brand-new creature part by part from 685+ animals and beings. Tap to roll, then draw and share it." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
 
@@ -27,6 +27,8 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="langSwitch" class="lang-switch"></div>
+
   <div class="orbs" aria-hidden="true">
     <span class="orb orb-a"></span>
     <span class="orb orb-b"></span>
@@ -35,16 +37,16 @@
 
   <main class="wrap">
     <header class="hero">
-      <h1 class="title">🐾 Random Animal Generator</h1>
-      <p class="byline">inspired by <a href="https://github.com/gracewqma/TuimizRandonAnimalGenerator" target="_blank" rel="noopener">Tuimiz</a> · web by <a href="https://instagram.com/mariolandaburu" target="_blank" rel="noopener">Mario&nbsp;Landáburu</a></p>
-      <p class="subtitle">Tap any row to roll it. Built from <strong id="animalCount">685</strong>+ animals and beings.</p>
+      <h1 class="title">🐾 <span data-i18n="heroTitle">Random Animal Generator</span></h1>
+      <p class="byline" data-i18n-html="bylineHtml">inspired by <a href="https://github.com/gracewqma/TuimizRandonAnimalGenerator" target="_blank" rel="noopener">Tuimiz</a> · web by <a href="https://instagram.com/mariolandaburu" target="_blank" rel="noopener">Mario&nbsp;Landáburu</a></p>
+      <p class="subtitle"><span data-i18n="subA">Tap any row to roll it. Built from </span><strong id="animalCount">685</strong><span data-i18n="subB">+ animals and beings.</span></p>
     </header>
 
     <section class="panel types" aria-label="Animal type filter">
       <div class="types-head">
-        <span class="types-title">Include animal types</span>
+        <span class="types-title" data-i18n="includeTypes">Include animal types</span>
         <button id="selectAll" class="toggle-all is-on" type="button" aria-pressed="true">
-          <span class="dot"></span> Select all
+          <span class="dot"></span> <span data-i18n="selectAll">Select all</span>
         </button>
       </div>
       <div id="typeChips" class="chips"></div>
@@ -52,7 +54,7 @@
 
     <div class="controls">
       <button id="clearBtn" class="btn btn-ghost" type="button">
-        <span class="btn-emoji">↺</span> Clear
+        <span class="btn-emoji">↺</span> <span data-i18n="clear">Clear</span>
       </button>
       <a href="/creations" class="btn btn-primary" id="viewCreations">
         <svg class="art-ico" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -61,7 +63,7 @@
           <circle cx="12.3" cy="9.8" r="1.7" fill="#2e9d5b"/>
           <circle cx="18" cy="8.6" r="1.7" fill="#ff5a16"/>
           <circle cx="22" cy="13" r="1.7" fill="#f2c14e"/>
-        </svg> View creations
+        </svg> <span data-i18n="viewCreations">View creations</span>
       </a>
     </div>
 
@@ -74,7 +76,7 @@
     </div>
 
     <footer class="foot">
-      <span>Tap a row to roll · tap the name to copy · <span class="kbd">🎲</span> rerolls · <span class="kbd">🔍</span> Google Images</span>
+      <span data-i18n-html="footerHtml">Tap a row to roll · tap the name to copy · <span class="kbd">🎲</span> rerolls · <span class="kbd">🔍</span> Google Images</span>
     </footer>
   </main>
 

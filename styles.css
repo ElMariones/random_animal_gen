@@ -60,7 +60,7 @@ body {
 
 /* The page chrome (hero + type selector) is WIDE; the generator column itself
    is NARROW so it crops cleanly to a 9:16 TikTok screen recording. */
-.wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: clamp(16px, 3vw, 32px) clamp(16px, 4vw, 32px) 24px; }
+.wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: clamp(48px, 6vw, 56px) clamp(16px, 4vw, 32px) 24px; }
 
 /* shared narrow column used by the generator (TikTok-safe width) */
 :root { --tiktok-col: 420px; }
@@ -272,6 +272,31 @@ body {
 /* footer */
 .foot { text-align: center; margin-top: 12px; color: var(--muted); font-size: 13.5px; }
 .kbd { background: var(--bg1); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+
+/* language switcher (top-right) */
+.lang-switch { position: fixed; top: 12px; right: 14px; z-index: 70; font-family: var(--font-body); }
+.lang-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg1); border: 2px solid var(--ink); border-radius: var(--r-full);
+  padding: 5px 11px; font: inherit; font-weight: 700; font-size: 13px; color: var(--text);
+  cursor: pointer; box-shadow: 3px 3px 0 var(--ink-shadow);
+  transition: transform var(--dur-xs) var(--ease), box-shadow var(--dur-xs) var(--ease);
+}
+.lang-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink-shadow); }
+.lang-globe { font-size: 14px; line-height: 1; }
+.lang-caret { font-size: 10px; color: var(--muted); }
+.lang-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); margin: 0; padding: 6px; list-style: none;
+  min-width: 132px; background: var(--bg1); border: 2px solid var(--ink); border-radius: var(--r-md);
+  box-shadow: 4px 4px 0 var(--ink-shadow); animation: pop var(--dur-sm) var(--spring);
+}
+.lang-menu li { margin: 0; }
+.lang-menu button {
+  display: block; width: 100%; text-align: left; background: transparent; border: 0;
+  font: inherit; font-size: 14px; color: var(--text); padding: 8px 10px; border-radius: var(--r-sm); cursor: pointer;
+}
+.lang-menu button:hover { background: var(--bg2); }
+.lang-menu button.is-active { color: var(--accent); font-weight: 700; }
 
 /* toast */
 .toast {

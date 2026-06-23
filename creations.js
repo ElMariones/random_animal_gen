@@ -1,4 +1,5 @@
 import { supabase, uploadToCloudinary, isConfigured, voterId } from "./db.js";
+import { T, onLang } from "./i18n.js";
 
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
@@ -25,7 +26,9 @@ function showToast(msg) {
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => $toast.classList.remove("show"), 2200);
 }
-function setStatus(msg) { $status.textContent = msg; $status.hidden = !msg; }
+// Status is stored by key so it can re-localize when the language changes.
+let statusKey = null;
+function setStatus(key) { statusKey = key; $status.textContent = key ? T()[key] : ""; $status.hidden = !key; }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -49,11 +52,11 @@ function socialLabel(raw) {
 // ── gallery ──────────────────────────────────────────────────────────────────
 async function loadGallery() {
   if (!isConfigured()) {
-    setStatus("🛠️ The gallery isn't connected yet. Add your Cloudinary + Supabase keys in config.js (see SETUP.md) to switch it on.");
+    setStatus("galNotConfigured");
     $openBtn.disabled = true;
     return;
   }
-  setStatus("Loading creations…");
+  setStatus("galLoading");
   // Most-liked first, newest as the tie-breaker.
   const { data, error } = await supabase
     .from("creations")
@@ -62,12 +65,12 @@ async function loadGallery() {
     .order("likes", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (error) { setStatus("Couldn't load the gallery right now. Try again later."); return; }
+  if (error) { setStatus("galLoadError"); return; }
   if (!data || data.length === 0) {
-    setStatus("No creations yet — be the first to add one! 🎨");
+    setStatus("galEmpty");
     return;
   }
-  setStatus("");
+  setStatus(null);
   await loadMyLikes(data.map((c) => c.id));
   $gallery.innerHTML = data.map(renderCard).join("");
 }
@@ -101,7 +104,7 @@ function renderCard(c) {
       <figcaption class="card-cap">
         <div class="card-text">${title}${artist}</div>
         <button class="like-btn${liked ? " is-liked" : ""}" type="button"
-                data-id="${esc(c.id)}" aria-pressed="${liked}" title="Like this creation">
+                data-id="${esc(c.id)}" aria-pressed="${liked}" title="${esc(T().likeTitle)}">
           <span class="like-heart">${liked ? "❤️" : "🤍"}</span>
           <span class="like-count">${Number(c.likes) || 0}</span>
         </button>
@@ -145,7 +148,7 @@ $gallery.addEventListener("click", async (e) => {
       btn.setAttribute("aria-pressed", "true");
     }
   } catch {
-    showToast("Couldn't register that like — try again.");
+    showToast(T().likeError);
   } finally {
     btn.disabled = false;
     likeBusy = false;
@@ -154,7 +157,7 @@ $gallery.addEventListener("click", async (e) => {
 
 // ── submission dialog ────────────────────────────────────────────────────────
 function openDialog() {
-  if (!isConfigured()) { showToast("Gallery isn't connected yet — see SETUP.md"); return; }
+  if (!isConfigured()) { showToast(T().notConnectedToast); return; }
   $formMsg.hidden = true;
   $dialog.showModal();
 }
@@ -182,7 +185,7 @@ function setSending(sending, pct) {
   if (sending) {
     $sendLabel.hidden = true;
     $sendProg.hidden = false;
-    $sendProg.textContent = pct != null ? `Uploading… ${Math.round(pct * 100)}%` : "Saving…";
+    $sendProg.textContent = pct != null ? T().uploading(Math.round(pct * 100)) : T().saving;
   } else {
     $sendLabel.hidden = false;
     $sendProg.hidden = true;
@@ -198,11 +201,11 @@ $form.addEventListener("submit", async (e) => {
   const title = document.getElementById("titleInput").value.trim();
   const social = normalizeUrl(document.getElementById("socialInput").value);
 
-  if (!file) return setFormError("Please choose an image.");
-  if (!file.type.startsWith("image/")) return setFormError("That file isn't an image.");
-  if (file.size > MAX_BYTES) return setFormError("Image is over 10 MB — please shrink it a bit.");
-  if (!artist) return setFormError("Please add your name or handle.");
-  if (social && !safeUrl(social)) return setFormError("That social link doesn't look right — fix it or leave it blank.");
+  if (!file) return setFormError(T().errNoImage);
+  if (!file.type.startsWith("image/")) return setFormError(T().errNotImage);
+  if (file.size > MAX_BYTES) return setFormError(T().errTooBig);
+  if (!artist) return setFormError(T().errNoArtist);
+  if (social && !safeUrl(social)) return setFormError(T().errBadSocial);
 
   try {
     setSending(true, 0);
@@ -218,10 +221,10 @@ $form.addEventListener("submit", async (e) => {
     closeDialog();
     $form.reset();
     $preview.hidden = true;
-    showToast("Thanks! Your creation is in the queue for review. 🎉");
+    showToast(T().submitOk);
   } catch (err) {
     setSending(false);
-    setFormError(err?.message || "Something went wrong — please try again.");
+    setFormError(err?.message || T().submitErr);
   }
 });
 
@@ -230,6 +233,12 @@ $dialog.addEventListener("click", (e) => {
   const r = $dialog.querySelector(".submit-form").getBoundingClientRect();
   const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
   if (!inside) closeDialog();
+});
+
+// re-localize dynamic bits (gallery status, like buttons) when the language changes
+onLang(() => {
+  setStatus(statusKey);
+  $gallery.querySelectorAll(".like-btn").forEach((b) => { b.title = T().likeTitle; });
 });
 
 loadGallery();
