@@ -1,47 +1,12 @@
-# 🐾 Critter Forge — Random Animal Generator
+# 🐾 Random Animal Generator
 
-A cozy little web app that forges a brand-new creature by rolling each body part
-from hundreds of real animals. Filter by animal type, then spin.
+Roll a brand-new creature part by part — base, head, ears, eyes, nose, legs, feet,
+tail, coat, colour and an extra feature — each drawn from hundreds of real animals.
+Filter by animal type, then tap any row to roll it.
 
-## Features
+Inspired by [Tuimiz](https://github.com/gracewqma/TuimizRandonAnimalGenerator).
 
-- **11 body-part slots** — Base, Head, Ears, Eyes, Nose, Legs, Feet, Tail, Coat, Colour and an **Extra** feature.
-- **Type filter** — include any mix of Mammals, Birds, Fish, Reptiles, Amphibians, Insects, Bugs, Sea life, Dinosaurs and Mythical. A *Select all* toggle is on by default and flips off as soon as you deselect a type.
-- **Spin everything** or click a single card to re-roll just that part — slot-machine style, with a calm reduced-motion fallback.
-- **Visualize instantly** — every result links straight to **Google Images** (🔍) and has a one-tap **Copy** (📋); *Copy recipe* grabs the whole creature. No images are stored or hosted by the site.
+## Creations
 
-## Creations gallery
-
-`/creations` is a community exhibition: artists submit a drawing of a rolled creature
-(image + name + social link), visitors **like** their favourites (one per browser,
-sorted most-liked first), and you moderate submissions at `/admin`. Images live on
-Cloudinary's CDN; submissions, likes and approval status live in Supabase — both free
-tier, both client-side, no server. See [`SETUP.md`](SETUP.md) to switch it on.
-
-## Tech
-
-Plain HTML/CSS/JS (ES modules) — no build step, no dependencies (the Supabase client is
-loaded from a CDN). The palette and motion come from the Ko-fi design language in the
-(git-ignored) `design/` folder. `data.js` is generated from `animals.txt` and ships every
-animal pre-categorised. Branding uses **Promised Freyna**, body text **Cocogoose Classic**
-(see [`fonts/README.md`](fonts/README.md)).
-
-## Run locally
-
-It's a static site, so serve the folder over HTTP (ES modules need a server, not `file://`):
-
-```bash
-python3 -m http.server 5173
-# then open http://localhost:5173
-```
-
-## Deploy (Vercel)
-
-No framework, no build command — Vercel serves it as a static site. Either:
-
-```bash
-vercel
-```
-
-or import the repo at [vercel.com/new](https://vercel.com/new) and deploy with the
-default (static) settings. `vercel.json` only adds a couple of security headers.
+`/creations` is the community wall: real artists draw the creatures they roll and add
+them to the gallery for everyone to see and like.

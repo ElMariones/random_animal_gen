@@ -49,11 +49,6 @@ function showToast(msg) {
   showToast._t = setTimeout(() => $toast.classList.remove("show"), 1600);
 }
 
-async function copyText(text, okMsg) {
-  try { await navigator.clipboard.writeText(text); showToast(okMsg); return true; }
-  catch { showToast("Couldn't copy — check permissions"); return false; }
-}
-
 // ── type chips ───────────────────────────────────────────────────────────────
 function buildChips() {
   $chips.innerHTML = "";
@@ -115,26 +110,22 @@ function buildSlots() {
     el.dataset.part = part;
     el.style.animationDelay = (i * 30) + "ms";
     el.innerHTML = `
-      <div class="slot-main">
+      <div class="slot-top">
         <span class="slot-label">${PART_LABELS[part]}</span>
-        <div class="slot-value-wrap">
-          <button class="slot-value" type="button"><span class="ghost">🎲 Tap to roll</span></button>
-          <span class="reroll-hint">tap again to reroll</span>
-        </div>
-      </div>
-      <div class="slot-right">
         <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
         <div class="slot-actions">
-          <a class="ico-btn gimg" target="_blank" rel="noopener">🔍 Images</a>
-          <button class="ico-btn copy" type="button">📋 Copy</button>
+          <a class="ico-btn gimg" target="_blank" rel="noopener" title="Search Google Images" aria-label="Search Google Images">🔍 Images</a>
         </div>
-      </div>`;
+      </div>
+      <div class="slot-value-row">
+        <button class="slot-value" type="button"><span class="ghost">Tap to roll</span></button>
+        <span class="reroll-hint">tap again to reroll</span>
+      </div>
+      <span class="roll-dice" aria-hidden="true">🎲</span>`;
 
-    el.querySelector(".slot-value").addEventListener("click", () => rollSlot(part));
-    el.querySelector(".copy").addEventListener("click", (e) => {
-      e.stopPropagation();
-      if (current[part]) copyText(current[part], `Copied “${current[part]}”`);
-    });
+    // the whole row is the roll target; the Images link opts out via stopPropagation
+    el.addEventListener("click", () => rollSlot(part));
+    el.querySelector(".gimg").addEventListener("click", (e) => e.stopPropagation());
     $slots.appendChild(el);
   });
 }
@@ -146,7 +137,7 @@ function hideSlot(part) {
   el.classList.add("is-hidden");
   el.classList.remove("landed", "is-rolling", "is-empty");
   el.querySelector(".slot-type").hidden = true;
-  el.querySelector(".slot-value").innerHTML = `<span class="ghost">🎲 Tap to roll</span>`;
+  el.querySelector(".slot-value").innerHTML = `<span class="ghost">Tap to roll</span>`;
 }
 
 function setSlotValue(part, value) {

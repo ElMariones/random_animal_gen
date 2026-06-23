@@ -132,9 +132,9 @@ New submissions land as `pending` and only appear in the gallery once you approv
 
 ## 4. Fonts
 
-The title/branding uses **Promised Freyna** and body text uses **Cocogoose Classic**.
-They're not bundled — see [`fonts/README.md`](fonts/README.md) to download and drop the
-files in `/fonts`. Until then everything falls back to DM Sans automatically.
+Nothing to do — the title/branding uses **Handjet** and body text uses **Fresca**, both
+pulled from **Google Fonts** via a `<link>` in each page's `<head>` (DM Sans is the
+fallback). No files to host.
 
 ---
 
