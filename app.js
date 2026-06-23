@@ -146,7 +146,7 @@ function buildSlots() {
         <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
         <div class="slot-actions">
           <a class="ico-btn gimg" target="_blank" rel="noopener" title="Search Google Images" aria-label="Search Google Images">🔍</a>
-          <button class="ico-btn reroll" type="button" title="Reroll this part" aria-label="Reroll this part">↻</button>
+          <button class="ico-btn reroll" type="button" title="Reroll this part" aria-label="Reroll this part">🎲</button>
         </div>
       </div>
       <span class="roll-dice" aria-hidden="true">🎲</span>`;
@@ -161,7 +161,7 @@ function buildSlots() {
       if (el.classList.contains("is-hidden")) rollSlot(part);
       else copyName(part);
     });
-    // The ↻ button is the dedicated reroll; Images opts out of any row click.
+    // The 🎲 button is the dedicated reroll; Images opts out of any row click.
     el.querySelector(".reroll").addEventListener("click", (e) => { e.stopPropagation(); if (!isBusy()) rollSlot(part); });
     el.querySelector(".gimg").addEventListener("click", (e) => e.stopPropagation());
     // While still "Tap to roll", the whole row is one big roll target.

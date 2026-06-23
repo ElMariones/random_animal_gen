@@ -224,8 +224,15 @@ body {
   width: 28px; height: 26px; cursor: pointer; transition: all var(--dur-xs) var(--ease);
 }
 .ico-btn:hover { color: var(--accent); background: #ffe1d2; transform: translateY(-1px); }
-.ico-btn.reroll { font-size: 16px; font-weight: 700; }
-.ico-btn.reroll:hover { transform: rotate(-110deg) translateY(0); }
+.ico-btn.reroll { font-size: 15px; }
+.ico-btn.reroll:hover { animation: dice-roll .55s var(--ease); }
+@keyframes dice-roll {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(-22deg) scale(1.16); }
+  50%  { transform: rotate(16deg)  scale(1.16); }
+  75%  { transform: rotate(-8deg)  scale(1.08); }
+  100% { transform: rotate(0deg)   scale(1); }
+}
 
 /* dice affordance — shown on the right only while the row is still "Tap to roll" */
 .roll-dice {
