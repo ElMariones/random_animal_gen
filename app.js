@@ -1,4 +1,5 @@
 import { PART_ORDER, PART_LABELS, TYPE_ORDER, TYPE_META, PARTS, EXTRAS, TYPES } from "./data.js";
+import { playRoll } from "./fx.js";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -47,6 +48,34 @@ function showToast(msg) {
   $toast.classList.add("show");
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => $toast.classList.remove("show"), 1600);
+}
+
+// Copy text, falling back to the legacy path when the async API is unavailable.
+async function copyToClipboard(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch { /* fall through */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.top = "-9999px";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch { return false; }
+}
+
+// Copy a revealed name to the clipboard with a quick visual "Copied" flash.
+async function copyName(part) {
+  const value = current[part];
+  if (!value) return;
+  if (!(await copyToClipboard(value))) { showToast("Couldn't copy — check permissions"); return; }
+  const el = $slots.querySelector(`.slot[data-part="${part}"]`);
+  el.classList.remove("copied");
+  void el.offsetWidth;            // restart the pop animation on repeat copies
+  el.classList.add("copied");
+  clearTimeout(copyName._t);
+  copyName._t = setTimeout(() => el.classList.remove("copied"), 1300);
+  showToast(`Copied “${value}”`);
 }
 
 // ── type chips ───────────────────────────────────────────────────────────────
@@ -110,22 +139,33 @@ function buildSlots() {
     el.dataset.part = part;
     el.style.animationDelay = (i * 30) + "ms";
     el.innerHTML = `
-      <div class="slot-top">
-        <span class="slot-label">${PART_LABELS[part]}</span>
+      <span class="slot-label">${PART_LABELS[part]}</span>
+      <button class="slot-value" type="button"><span class="ghost">Tap to roll</span></button>
+      <span class="copied-flag" aria-hidden="true">✓ Copied</span>
+      <div class="slot-right">
         <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
         <div class="slot-actions">
-          <a class="ico-btn gimg" target="_blank" rel="noopener" title="Search Google Images" aria-label="Search Google Images">🔍 Images</a>
+          <a class="ico-btn gimg" target="_blank" rel="noopener" title="Search Google Images" aria-label="Search Google Images">🔍</a>
+          <button class="ico-btn reroll" type="button" title="Reroll this part" aria-label="Reroll this part">↻</button>
         </div>
-      </div>
-      <div class="slot-value-row">
-        <button class="slot-value" type="button"><span class="ghost">Tap to roll</span></button>
-        <span class="reroll-hint">tap again to reroll</span>
       </div>
       <span class="roll-dice" aria-hidden="true">🎲</span>`;
 
-    // the whole row is the roll target; the Images link opts out via stopPropagation
-    el.addEventListener("click", () => rollSlot(part));
+    const valueBtn = el.querySelector(".slot-value");
+    const isBusy = () => el.classList.contains("is-rolling");
+
+    // Tap the name → roll it the first time, copy it once revealed.
+    valueBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (isBusy()) return;
+      if (el.classList.contains("is-hidden")) rollSlot(part);
+      else copyName(part);
+    });
+    // The ↻ button is the dedicated reroll; Images opts out of any row click.
+    el.querySelector(".reroll").addEventListener("click", (e) => { e.stopPropagation(); if (!isBusy()) rollSlot(part); });
     el.querySelector(".gimg").addEventListener("click", (e) => e.stopPropagation());
+    // While still "Tap to roll", the whole row is one big roll target.
+    el.addEventListener("click", () => { if (el.classList.contains("is-hidden") && !isBusy()) rollSlot(part); });
     $slots.appendChild(el);
   });
 }
@@ -135,7 +175,7 @@ function hideSlot(part) {
   const el = $slots.querySelector(`.slot[data-part="${part}"]`);
   current[part] = null;
   el.classList.add("is-hidden");
-  el.classList.remove("landed", "is-rolling", "is-empty");
+  el.classList.remove("landed", "is-rolling", "is-empty", "copied");
   el.querySelector(".slot-type").hidden = true;
   el.querySelector(".slot-value").innerHTML = `<span class="ghost">Tap to roll</span>`;
 }
@@ -162,6 +202,7 @@ function setSlotValue(part, value) {
 
   const meta = typeBadge(part, value);
   badge.hidden = false;
+  badge.title = meta.label;       // emoji-only chip; full category shows on hover
   badge.querySelector(".st-emoji").textContent = meta.emoji;
   badge.querySelector(".st-label").textContent = meta.label;
   gimg.href = imagesUrl(value);
@@ -195,7 +236,12 @@ function rollSlot(part) {
       valueBtn.textContent = rand(pool);
       i++;
       if (i < ticks) setTimeout(step, 40 + i * i * 1.6);  // ease-out slow-down
-      else { el.classList.remove("is-rolling"); setSlotValue(part, final); resolve(); }
+      else {
+        el.classList.remove("is-rolling");
+        setSlotValue(part, final);
+        playRoll(part === "extra" ? "feature" : TYPES[final], el);   // category-themed burst
+        resolve();
+      }
     };
     step();
   });

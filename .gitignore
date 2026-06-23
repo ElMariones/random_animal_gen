@@ -11,3 +11,7 @@ animals.txt
 # deps (none used, but just in case)
 node_modules/
 .vercel
+
+# Local config with Cloudinary + Supabase keys — kept out of the repo.
+# Copy config.example.js to config.js and fill in your own values.
+config.js

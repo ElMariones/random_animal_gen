@@ -60,7 +60,7 @@ body {
 
 /* The page chrome (hero + type selector) is WIDE; the generator column itself
    is NARROW so it crops cleanly to a 9:16 TikTok screen recording. */
-.wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: clamp(20px, 4vw, 40px) clamp(16px, 4vw, 32px) 40px; }
+.wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: clamp(16px, 3vw, 32px) clamp(16px, 4vw, 32px) 24px; }
 
 /* shared narrow column used by the generator (TikTok-safe width) */
 :root { --tiktok-col: 420px; }
@@ -71,7 +71,7 @@ body {
   font-family: var(--font-display);
   font-optical-sizing: auto;
   font-variation-settings: "ELGR" 1, "ELSH" 2;
-  font-size: clamp(34px, 7.5vw, 64px);
+  font-size: clamp(30px, 6.2vw, 52px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .02em;
@@ -90,7 +90,7 @@ body {
   border: 2px solid var(--ink);
   border-radius: var(--r-lg);
   box-shadow: 5px 5px 0 var(--ink-shadow);
-  padding: clamp(18px, 3vw, 26px);
+  padding: clamp(12px, 2.2vw, 18px);
 }
 
 /* type filter */
@@ -111,7 +111,7 @@ body {
 .toggle-all.is-on .dot::after { content: "✓"; position: absolute; inset: 0; color: #fff; font-size: 11px; display: grid; place-items: center; }
 .toggle-all:hover { transform: translateY(-1px); }
 
-.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   display: inline-flex; align-items: center; gap: 8px;
   border: 1.5px solid var(--line); background: var(--bg1);
@@ -155,58 +155,28 @@ body {
 /* side decorations no longer fit the narrow column — retire them */
 .deco { display: none; }
 
-/* slots list — compact stacked rows so the NAME gets the full column width */
-.slots { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+/* slots list — compact single-line rows; the NAME is the hero, controls sit right */
+.slots { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
 .slot {
   position: relative; background: var(--bg1); border: 2px solid var(--ink);
-  border-radius: var(--r-md); padding: 5px 14px 6px; box-shadow: 4px 4px 0 var(--ink-shadow);
-  display: flex; flex-direction: column; gap: 0; min-width: 0; cursor: pointer;
+  border-radius: var(--r-md); padding: 4px 13px; box-shadow: 4px 4px 0 var(--ink-shadow);
+  display: flex; align-items: center; gap: 9px; min-width: 0;
   transition: transform var(--dur-sm) var(--ease), box-shadow var(--dur-sm) var(--ease), border-color var(--dur-sm) var(--ease), background var(--dur-sm) var(--ease);
   animation: slide-up var(--dur-md) var(--ease) both;
 }
-.slot:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink-shadow); border-color: var(--accent); }
 .slot.is-rolling { border-color: var(--accent); }
 .slot.landed { border-color: var(--accent); }
-.slot.is-hidden { background: var(--bg2); border-color: var(--ink); }
-.slot.is-hidden:hover { transform: translate(-1px, -1px); }
+.slot:not(.is-hidden):hover { border-color: var(--accent); }
+.slot.is-hidden { background: var(--bg2); border-color: var(--ink); cursor: pointer; }
+.slot.is-hidden:hover { transform: translate(-1px, -1px); box-shadow: 6px 6px 0 var(--ink-shadow); border-color: var(--accent); }
 
-/* top meta line: label + category on the left, small icon buttons on the right */
-.slot-top { display: flex; align-items: center; gap: 8px; min-height: 22px; }
-.slot.is-hidden .slot-top { min-height: 0; }
 .slot-label {
-  font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  color: #fff; background: var(--ink); padding: 4px 11px; border-radius: var(--r-full);
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: var(--ink); padding: 3px 9px; border-radius: var(--r-full);
   line-height: 1.25; flex-shrink: 0;
 }
 
-.slot-type {
-  display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600;
-  color: var(--muted); background: var(--bg2); padding: 2px 9px; border-radius: var(--r-full);
-  white-space: nowrap; min-width: 0; overflow: hidden;
-}
-.slot-type .st-emoji { font-size: 12px; }
-.slot-type .st-label { overflow: hidden; text-overflow: ellipsis; }
-
-.slot-actions { display: flex; gap: 6px; margin-left: auto; flex-shrink: 0; }
-.ico-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none;
-  font: inherit; font-size: 12.5px; font-weight: 700; line-height: 1; color: var(--muted);
-  background: var(--bg2); border: 1px solid transparent; border-radius: var(--r-sm);
-  padding: 6px 11px; cursor: pointer; transition: all var(--dur-xs) var(--ease); white-space: nowrap;
-}
-.ico-btn:hover { color: var(--accent); background: #ffe1d2; transform: translateY(-1px); }
-
-/* dice affordance — shown on the right only while the row is still "Tap to roll" */
-.roll-dice {
-  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-  font-size: 22px; line-height: 1; display: none; pointer-events: none;
-  transition: transform var(--dur-sm) var(--spring);
-}
-.slot.is-hidden .roll-dice { display: block; }
-.slot.is-hidden:hover .roll-dice { transform: translateY(-50%) rotate(-12deg) scale(1.12); }
-
-/* value line: the rolled name renders at full width; tiny reroll hint trails it */
-.slot-value-row { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+/* the rolled name (also the copy button once revealed) */
 .slot-value {
   appearance: none; border: 0; background: transparent; text-align: left;
   font: inherit; font-weight: 700; font-size: clamp(18px, 4.6vw, 23px); line-height: 1.1;
@@ -214,7 +184,6 @@ body {
   text-transform: capitalize; word-break: break-word; min-width: 0; flex: 0 1 auto;
   transition: color var(--dur-xs) var(--ease);
 }
-/* Ko-fi style active underline — slides in under the revealed value */
 .slot-value::after {
   content: ""; display: block; height: 2.5px; width: 0;
   margin-top: 2px; border-radius: 2px; background: var(--accent);
@@ -226,22 +195,70 @@ body {
 .slot.is-hidden .slot-value:hover .ghost { color: var(--accent); }
 .slot.landed .slot-value { animation: pop var(--dur-md) var(--spring); }
 .slot.is-empty .slot-value { color: var(--muted); font-weight: 500; font-style: italic; text-transform: none; }
+/* once revealed, the name is a copy affordance */
+.slot:not(.is-hidden):not(.is-empty) .slot-value { cursor: copy; }
+.slot.copied .slot-value { color: var(--green); }
 
-.reroll-hint { display: none; font-size: 10.5px; font-weight: 500; color: #b8ada0; letter-spacing: .01em; flex-shrink: 0; }
-.slot:not(.is-hidden):not(.is-empty) .reroll-hint { display: inline; }
+/* "Copied" flag that pops in beside the name */
+.copied-flag {
+  display: none; flex-shrink: 0; font-size: 11px; font-weight: 700; color: #fff;
+  background: var(--green); padding: 2px 9px; border-radius: var(--r-full); white-space: nowrap;
+}
+.slot.copied .copied-flag { display: inline-flex; animation: pop var(--dur-md) var(--spring); }
+
+/* right cluster: category emoji chip + small action icons */
+.slot-right { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
+.slot-type {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+  color: var(--muted); background: var(--bg2); padding: 3px 7px; border-radius: var(--r-full);
+  white-space: nowrap;
+}
+.slot-type .st-emoji { font-size: 14px; line-height: 1; }
+.slot-type .st-label { display: none; }   /* emoji carries it; full label is the hover title */
+
+.slot-actions { display: flex; gap: 5px; }
+.ico-btn {
+  display: inline-flex; align-items: center; justify-content: center; text-decoration: none;
+  font-size: 14px; line-height: 1; color: var(--muted);
+  background: var(--bg2); border: 1px solid transparent; border-radius: var(--r-sm);
+  width: 28px; height: 26px; cursor: pointer; transition: all var(--dur-xs) var(--ease);
+}
+.ico-btn:hover { color: var(--accent); background: #ffe1d2; transform: translateY(-1px); }
+.ico-btn.reroll { font-size: 16px; font-weight: 700; }
+.ico-btn.reroll:hover { transform: rotate(-110deg) translateY(0); }
+
+/* dice affordance — shown on the right only while the row is still "Tap to roll" */
+.roll-dice {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  font-size: 20px; line-height: 1; display: none; pointer-events: none;
+  transition: transform var(--dur-sm) var(--spring);
+}
+.slot.is-hidden .roll-dice { display: block; }
+.slot.is-hidden:hover .roll-dice { transform: translateY(-50%) rotate(-12deg) scale(1.15); }
 
 /* hide value-dependent UI until revealed */
-.slot.is-hidden .slot-type,
-.slot.is-hidden .slot-actions,
+.slot.is-hidden .slot-right,
 .slot.is-empty .slot-actions { display: none; }
 
+/* ── React roll FX overlay (see fx.js) ─────────────────────────────────────── */
+#fx-root { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 60; }
+.fx-burst { position: absolute; }
+.fx-particle {
+  position: absolute; left: 0; top: 0; will-change: transform, opacity;
+  animation: fx-fly 1s ease-out forwards;
+}
+@keyframes fx-fly {
+  0%   { transform: translate(-50%, -50%) scale(.2) rotate(0deg); opacity: 0; }
+  18%  { opacity: 1; transform: translate(calc(-50% + var(--tx) * .35), calc(-50% + var(--ty) * .35)) scale(1.15) rotate(calc(var(--rot) * .35)); }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.85) rotate(var(--rot)); opacity: 0; }
+}
+
 @media (max-width: 420px) {
-  .reroll-hint { display: none !important; }
-  .slot-type { font-size: 10px; }
+  .slot-value { font-size: clamp(17px, 5vw, 21px); }
 }
 
 /* footer */
-.foot { text-align: center; margin-top: 20px; color: var(--muted); font-size: 13.5px; }
+.foot { text-align: center; margin-top: 12px; color: var(--muted); font-size: 13.5px; }
 .kbd { background: var(--bg1); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
 
 /* toast */

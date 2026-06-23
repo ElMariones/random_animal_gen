@@ -29,6 +29,14 @@ function setStatus(msg) { $status.textContent = msg; $status.hidden = !msg; }
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+// Accept bare links like "instagram.com/me" by assuming https:// when no scheme is given.
+function normalizeUrl(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (/^https?:\/\//i.test(s)) return s;
+  return "https://" + s.replace(/^\/+/, "");
+}
+
 // Only allow http(s) links, and render them safely.
 function safeUrl(raw) {
   try { const u = new URL(raw); return (u.protocol === "http:" || u.protocol === "https:") ? u.href : null; }
@@ -188,13 +196,13 @@ $form.addEventListener("submit", async (e) => {
   const file = $imageIn.files?.[0];
   const artist = document.getElementById("artistInput").value.trim();
   const title = document.getElementById("titleInput").value.trim();
-  const social = document.getElementById("socialInput").value.trim();
+  const social = normalizeUrl(document.getElementById("socialInput").value);
 
   if (!file) return setFormError("Please choose an image.");
   if (!file.type.startsWith("image/")) return setFormError("That file isn't an image.");
   if (file.size > MAX_BYTES) return setFormError("Image is over 10 MB — please shrink it a bit.");
   if (!artist) return setFormError("Please add your name or handle.");
-  if (!safeUrl(social)) return setFormError("Please enter a valid http(s) social link.");
+  if (social && !safeUrl(social)) return setFormError("That social link doesn't look right — fix it or leave it blank.");
 
   try {
     setSending(true, 0);
@@ -202,7 +210,7 @@ $form.addEventListener("submit", async (e) => {
 
     setSending(true, null); // saving row
     const { error } = await supabase.from("creations").insert({
-      artist, title: title || null, social_url: social, image_url: imageUrl, status: "pending",
+      artist, title: title || null, social_url: social || null, image_url: imageUrl, status: "pending",
     });
     if (error) throw error;
 

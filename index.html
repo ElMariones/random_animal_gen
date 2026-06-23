@@ -53,12 +53,15 @@
     </div>
 
     <footer class="foot">
-      <span>Tap any row to roll it · <span class="kbd">🔍</span> opens Google Images</span>
+      <span>Tap a row to roll · tap the name to <span class="kbd">📋</span> copy · <span class="kbd">↻</span> rerolls · <span class="kbd">🔍</span> Google Images</span>
     </footer>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <!-- React powers the category-themed roll animations (see fx.js) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>
