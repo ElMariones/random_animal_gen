@@ -4,33 +4,31 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 
 // ── state ──────────────────────────────────────────────────────────────────
 const selectedTypes = new Set(TYPE_ORDER);   // all on by default
-const current = {};                          // part -> last rolled value
+const current = {};                          // part -> revealed value (or null when hidden)
+const rollToken = {};                        // part -> id; bumping it cancels an in-flight roll
 
 // ── element refs ─────────────────────────────────────────────────────────────
-const $chips   = document.getElementById("typeChips");
-const $slots   = document.getElementById("slots");
+const $chips     = document.getElementById("typeChips");
+const $slots     = document.getElementById("slots");
 const $selectAll = document.getElementById("selectAll");
-const $spinAll = document.getElementById("spinAll");
-const $copyAll = document.getElementById("copyAll");
-const $hint    = document.getElementById("hint");
-const $toast   = document.getElementById("toast");
-const $count   = document.getElementById("animalCount");
+const $reroll    = document.getElementById("reroll");
+const $clear     = document.getElementById("clearBtn");
+const $copyAll   = document.getElementById("copyAll");
+const $hint      = document.getElementById("hint");
+const $toast     = document.getElementById("toast");
+const $count     = document.getElementById("animalCount");
 
-// total unique animals (across all body-part lists)
 $count.textContent = new Set([].concat(...Object.values(PARTS))).size;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-// pool of candidates for a part given the current type filter
 function poolFor(part) {
   if (part === "extra") return EXTRAS;                 // features are never type-filtered
   return PARTS[part].filter((a) => selectedTypes.has(TYPES[a]));
 }
 
-function imagesUrl(q) {
-  return "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(q);
-}
+const imagesUrl = (q) => "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(q);
 
 function typeBadge(part, value) {
   if (part === "extra") return { emoji: "✨", label: "Feature" };
@@ -46,14 +44,8 @@ function showToast(msg) {
 }
 
 async function copyText(text, okMsg) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast(okMsg);
-    return true;
-  } catch {
-    showToast("Couldn't copy — check permissions");
-    return false;
-  }
+  try { await navigator.clipboard.writeText(text); showToast(okMsg); return true; }
+  catch { showToast("Couldn't copy — check permissions"); return false; }
 }
 
 // ── type chips ───────────────────────────────────────────────────────────────
@@ -75,8 +67,7 @@ function buildChips() {
 }
 
 function toggleType(t, btn) {
-  if (selectedTypes.has(t)) selectedTypes.delete(t);
-  else selectedTypes.add(t);
+  if (selectedTypes.has(t)) selectedTypes.delete(t); else selectedTypes.add(t);
   const on = selectedTypes.has(t);
   btn.classList.toggle("is-on", on);
   btn.setAttribute("aria-pressed", String(on));
@@ -93,8 +84,7 @@ function syncSelectAll() {
 $selectAll.addEventListener("click", () => {
   const all = selectedTypes.size === TYPE_ORDER.length;
   selectedTypes.clear();
-  if (!all) TYPE_ORDER.forEach((t) => selectedTypes.add(t)); // turn all on
-  // if it was all-on, we leave it empty (toggled off)
+  if (!all) TYPE_ORDER.forEach((t) => selectedTypes.add(t));   // off -> turn all on
   document.querySelectorAll(".chip").forEach((c) => {
     const on = selectedTypes.has(c.dataset.type);
     c.classList.toggle("is-on", on);
@@ -104,43 +94,51 @@ $selectAll.addEventListener("click", () => {
   updateAvailability();
 });
 
-// reflect whether anything can be generated
 function updateAvailability() {
   const none = selectedTypes.size === 0;
-  $spinAll.disabled = none;
+  $reroll.disabled = none;
   $hint.hidden = !none;
-  if (none) $hint.textContent = "Pick at least one animal type to start forging.";
+  if (none) $hint.textContent = "Pick at least one animal type to start rolling.";
 }
 
-// ── slots ────────────────────────────────────────────────────────────────────
+// ── list rows ────────────────────────────────────────────────────────────────
 function buildSlots() {
   $slots.innerHTML = "";
   PART_ORDER.forEach((part, i) => {
     const el = document.createElement("article");
-    el.className = "slot is-empty";
+    el.className = "slot is-hidden";
     el.dataset.part = part;
-    el.style.animationDelay = (i * 35) + "ms";
+    el.style.animationDelay = (i * 30) + "ms";
     el.innerHTML = `
-      <div class="slot-top">
+      <div class="slot-main">
         <span class="slot-label">${PART_LABELS[part]}</span>
-        <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
+        <button class="slot-value" type="button"><span class="ghost">🎲 Tap to reveal</span></button>
       </div>
-      <button class="slot-value" type="button">tap to roll</button>
-      <div class="slot-actions">
-        <a class="ico-btn gimg" target="_blank" rel="noopener">🔍 Images</a>
-        <button class="ico-btn copy" type="button">📋 Copy</button>
+      <div class="slot-right">
+        <span class="slot-type" hidden><span class="st-emoji"></span><span class="st-label"></span></span>
+        <div class="slot-actions">
+          <a class="ico-btn gimg" target="_blank" rel="noopener">🔍 Images</a>
+          <button class="ico-btn copy" type="button">📋 Copy</button>
+        </div>
       </div>`;
 
-    const valueBtn = el.querySelector(".slot-value");
-    valueBtn.addEventListener("click", () => {
-      if (el.classList.contains("is-empty") && !current[part]) return rollSlot(part);
-      rollSlot(part);
-    });
-    el.querySelector(".copy").addEventListener("click", () => {
+    el.querySelector(".slot-value").addEventListener("click", () => rollSlot(part));
+    el.querySelector(".copy").addEventListener("click", (e) => {
+      e.stopPropagation();
       if (current[part]) copyText(current[part], `Copied “${current[part]}”`);
     });
     $slots.appendChild(el);
   });
+}
+
+function hideSlot(part) {
+  rollToken[part] = (rollToken[part] || 0) + 1;   // cancel any in-flight roll
+  const el = $slots.querySelector(`.slot[data-part="${part}"]`);
+  current[part] = null;
+  el.classList.add("is-hidden");
+  el.classList.remove("landed", "is-rolling", "is-empty");
+  el.querySelector(".slot-type").hidden = true;
+  el.querySelector(".slot-value").innerHTML = `<span class="ghost">🎲 Tap to reveal</span>`;
 }
 
 function setSlotValue(part, value) {
@@ -149,12 +147,13 @@ function setSlotValue(part, value) {
   const badge = el.querySelector(".slot-type");
   const gimg = el.querySelector(".gimg");
 
-  if (!value) {
+  el.classList.remove("is-hidden");
+
+  if (!value) {                                  // safety net (shouldn't happen with merged types)
     current[part] = null;
     el.classList.add("is-empty");
-    el.classList.remove("landed");
     badge.hidden = true;
-    valueBtn.textContent = "no " + PART_LABELS[part].toLowerCase() + " for this filter";
+    valueBtn.textContent = "no match for this filter";
     return;
   }
 
@@ -169,16 +168,18 @@ function setSlotValue(part, value) {
   gimg.href = imagesUrl(value);
 
   el.classList.remove("landed");
-  void el.offsetWidth;        // restart pop animation
+  void el.offsetWidth;
   el.classList.add("landed");
 }
 
-// spin one slot: flicker through pool, then settle on a final pick
+// reveal/re-roll a single row: flicker through the pool, then settle
 function rollSlot(part) {
+  if (selectedTypes.size === 0) { showToast("Pick at least one animal type first"); return Promise.resolve(); }
   const pool = poolFor(part);
   const el = $slots.querySelector(`.slot[data-part="${part}"]`);
   const valueBtn = el.querySelector(".slot-value");
 
+  const myToken = (rollToken[part] = (rollToken[part] || 0) + 1);
   if (pool.length === 0) { setSlotValue(part, null); return Promise.resolve(); }
   const final = rand(pool);
 
@@ -186,49 +187,53 @@ function rollSlot(part) {
 
   return new Promise((resolve) => {
     el.classList.add("is-rolling");
-    el.classList.remove("is-empty", "landed");
+    el.classList.remove("is-hidden", "is-empty", "landed");
+    el.querySelector(".slot-type").hidden = true;
     let i = 0;
     const ticks = 14;
     const step = () => {
+      if (rollToken[part] !== myToken) return resolve();   // cancelled by clear / newer roll
       valueBtn.textContent = rand(pool);
-      valueBtn.style.textTransform = "capitalize";
       i++;
-      if (i < ticks) {
-        setTimeout(step, 40 + i * i * 1.6); // ease-out: slow down near the end
-      } else {
-        el.classList.remove("is-rolling");
-        setSlotValue(part, final);
-        resolve();
-      }
+      if (i < ticks) setTimeout(step, 40 + i * i * 1.6);  // ease-out slow-down
+      else { el.classList.remove("is-rolling"); setSlotValue(part, final); resolve(); }
     };
     step();
   });
 }
 
-// spin everything with a gentle stagger
-async function spinAll() {
+// ── controls ──────────────────────────────────────────────────────────────────
+let pendingTimers = [];
+function cancelPending() { pendingTimers.forEach(clearTimeout); pendingTimers = []; }
+
+async function rerollAll() {
   if (selectedTypes.size === 0) return;
-  $spinAll.classList.add("is-spinning");
+  cancelPending();
+  $reroll.classList.add("is-spinning");
   const jobs = PART_ORDER.map((part, i) =>
-    new Promise((res) => setTimeout(() => rollSlot(part).then(res), reduceMotion ? 0 : i * 80))
+    new Promise((res) => pendingTimers.push(setTimeout(() => rollSlot(part).then(res), reduceMotion ? 0 : i * 70)))
   );
   await Promise.all(jobs);
-  $spinAll.classList.remove("is-spinning");
+  $reroll.classList.remove("is-spinning");
 }
 
-$spinAll.addEventListener("click", spinAll);
+function clearAll() {
+  cancelPending();                       // stop not-yet-started staggered rolls
+  $reroll.classList.remove("is-spinning");
+  PART_ORDER.forEach(hideSlot);          // bumps tokens -> cancels in-flight rolls
+}
+
+$reroll.addEventListener("click", rerollAll);
+$clear.addEventListener("click", clearAll);
 
 $copyAll.addEventListener("click", () => {
-  const lines = PART_ORDER
-    .filter((p) => current[p])
-    .map((p) => `${PART_LABELS[p]}: ${current[p]}`);
-  if (!lines.length) return showToast("Spin something first!");
+  const lines = PART_ORDER.filter((p) => current[p]).map((p) => `${PART_LABELS[p]}: ${current[p]}`);
+  if (!lines.length) return showToast("Reveal something first!");
   copyText(lines.join("\n"), "Recipe copied to clipboard");
 });
 
-// ── init ───────────────────────────────────────────────────────────────────
+// ── init (nothing is revealed until the user acts) ───────────────────────────
 buildChips();
 buildSlots();
 syncSelectAll();
 updateAvailability();
-spinAll();   // forge a first creature on load

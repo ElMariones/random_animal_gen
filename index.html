@@ -20,8 +20,8 @@
 
   <main class="wrap">
     <header class="hero">
-      <h1 class="title">🐾 Critter&nbsp;Forge</h1>
-      <p class="subtitle">A random animal generator. Spin each body part to forge a brand-new creature from <strong id="animalCount">564</strong> real animals.</p>
+      <h1 class="title">🐾 Random Animal Gen <span class="by">by <a href="https://github.com/ElMariones" target="_blank" rel="noopener">Mario&nbsp;Landaburu</a></span></h1>
+      <p class="subtitle">Tap a row to reveal it, or reroll the whole creature — built from <strong id="animalCount">564</strong> real animals.</p>
     </header>
 
     <section class="panel types" aria-label="Animal type filter">
@@ -35,8 +35,11 @@
     </section>
 
     <div class="controls">
-      <button id="spinAll" class="btn btn-primary" type="button">
-        <span class="btn-emoji">✨</span> Spin everything
+      <button id="reroll" class="btn btn-primary" type="button">
+        <span class="btn-emoji">🎲</span> Reroll
+      </button>
+      <button id="clearBtn" class="btn btn-ghost" type="button">
+        <span class="btn-emoji">↺</span> Clear
       </button>
       <button id="copyAll" class="btn btn-ghost" type="button">
         <span class="btn-emoji">📋</span> Copy recipe
@@ -48,7 +51,7 @@
     <section id="slots" class="slots" aria-label="Generated creature"></section>
 
     <footer class="foot">
-      <span>Click any card to re-roll just that part · <span class="kbd">🔍</span> opens Google Images · <span class="kbd">📋</span> copies the name</span>
+      <span>Tap any row to reveal &amp; re-roll it · <span class="kbd">🔍</span> opens Google Images · <span class="kbd">📋</span> copies the name</span>
     </footer>
   </main>
 
