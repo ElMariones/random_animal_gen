@@ -1,10 +1,10 @@
-import { PART_ORDER, PART_LABELS, TYPE_ORDER, TYPE_META, PARTS, EXTRAS, TYPES } from "./data.js";
+import { PART_ORDER, PART_LABELS, TYPE_ORDER, TYPE_META, PARTS, EXTRAS, TYPES, DEFAULT_TYPES } from "./data.js";
 import { playRoll } from "./fx.js";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ── state ──────────────────────────────────────────────────────────────────
-const selectedTypes = new Set(TYPE_ORDER);   // all on by default
+const selectedTypes = new Set(DEFAULT_TYPES);   // everything except Pokémon on by default
 const current = {};                          // part -> revealed value (or null when hidden)
 const rollToken = {};                        // part -> id; bumping it cancels an in-flight roll
 
@@ -85,11 +85,12 @@ function buildChips() {
   for (const t of TYPE_ORDER) {
     const meta = TYPE_META[t];
     const count = new Set(everyAnimal.filter((a) => TYPES[a] === t)).size;
+    const on = selectedTypes.has(t);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "chip is-on";
+    btn.className = "chip" + (on ? " is-on" : "");
     btn.dataset.type = t;
-    btn.setAttribute("aria-pressed", "true");
+    btn.setAttribute("aria-pressed", String(on));
     btn.innerHTML = `<span class="c-emoji">${meta.emoji}</span>${meta.label}<span class="c-count">${count}</span>`;
     btn.addEventListener("click", () => toggleType(t, btn));
     $chips.appendChild(btn);

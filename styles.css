@@ -136,6 +136,9 @@ body {
   border: 1px solid transparent; transition: transform var(--dur-xs) var(--ease), box-shadow var(--dur-sm) var(--ease), background var(--dur-sm) var(--ease);
 }
 .btn-emoji { font-size: 18px; }
+/* inline SVG art icon (replaces the old painting emoji) */
+.art-ico { width: 22px; height: 22px; display: inline-block; flex-shrink: 0; }
+.title .art-ico.title-ico { width: .82em; height: .82em; vertical-align: -.04em; margin-right: .08em; }
 .btn-primary { background: linear-gradient(180deg, #ff7a42, var(--accent)); color: #fff; box-shadow: 0 6px 16px rgba(255,90,22,.32); }
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255,90,22,.40); }
 .btn-primary:active { transform: translateY(0) scale(.98); }
