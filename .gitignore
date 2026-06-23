@@ -1,0 +1,13 @@
+# Source design references & raw data (not deployed)
+design/
+animals.txt
+._animals.txt
+
+# OS / editor cruft
+.DS_Store
+._*
+*.log
+
+# deps (none used, but just in case)
+node_modules/
+.vercel

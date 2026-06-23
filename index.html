@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Critter Forge · Random Animal Generator</title>
+  <meta name="description" content="Spin up a brand-new creature, part by part, from hundreds of real animals. Filter by type, then forge your chimera." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐾</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="orbs" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+  </div>
+
+  <main class="wrap">
+    <header class="hero">
+      <h1 class="title">🐾 Critter&nbsp;Forge</h1>
+      <p class="subtitle">A random animal generator. Spin each body part to forge a brand-new creature from <strong id="animalCount">564</strong> real animals.</p>
+    </header>
+
+    <section class="panel types" aria-label="Animal type filter">
+      <div class="types-head">
+        <span class="types-title">Include animal types</span>
+        <button id="selectAll" class="toggle-all is-on" type="button" aria-pressed="true">
+          <span class="dot"></span> Select all
+        </button>
+      </div>
+      <div id="typeChips" class="chips"></div>
+    </section>
+
+    <div class="controls">
+      <button id="spinAll" class="btn btn-primary" type="button">
+        <span class="btn-emoji">✨</span> Spin everything
+      </button>
+      <button id="copyAll" class="btn btn-ghost" type="button">
+        <span class="btn-emoji">📋</span> Copy recipe
+      </button>
+    </div>
+
+    <p id="hint" class="hint" hidden></p>
+
+    <section id="slots" class="slots" aria-label="Generated creature"></section>
+
+    <footer class="foot">
+      <span>Click any card to re-roll just that part · <span class="kbd">🔍</span> opens Google Images · <span class="kbd">📋</span> copies the name</span>
+    </footer>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
